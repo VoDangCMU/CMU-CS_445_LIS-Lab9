@@ -1,0 +1,32 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  product-service:
+    build: ./product-service
+    container_name: product_service_lab9
+    networks:
+      - lab9-net
+    ports:
+      - "5001:5001"
+    environment:
+      # Định nghĩa API Key cho product-service
+      - PRODUCT_SERVICE_API_KEY=thisIsAStrongerKey123! # Thay đổi key ở đây
+
+  order-service:
+    build: ./order-service
+    container_name: order_service_lab9
+    ports:
+      - "5353:5353" # Mở cổng 5000 của order-service ra máy host
+    networks:
+      - lab9-net
+    environment:
+      # Cung cấp URL và API Key cho order-service để gọi product-service
+      - PRODUCT_SERVICE_URL=http://product-service:5001 # Giao tiếp qua tên service
+      - PRODUCT_SERVICE_API_KEY=thisIsAStrongerKey123! # Key phải khớp với product-service
+    depends_on:
+      - product-service # Đảm bảo product-service khởi động trước
+
+networks:
+  lab9-net:
+    driver: bridge
